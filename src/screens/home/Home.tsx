@@ -1,23 +1,43 @@
 import { useState, useEffect } from 'react';
 import { Header } from '../../components/Header';
-import { WiDaySunny, WiCloudy, WiRain, WiSnow, WiThunderstorm, WiCloud, WiNightStormShowers } from 'react-icons/wi';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
+interface ClimaAtual {
+  current: {
+    condition: {
+      text: string;
+    };
+    temp_c: number;
+    humidity: number;
+  };
+}
+interface PrevisaoSemanal {
+  date: string;
+  day: {
+    condition: {
+      text: string;
+    };
+    maxtemp_c: number;
+    mintemp_c: number;
+  };
+}
+interface Cotacoes {
+  soja: number;
+  milho: number;
+  trigo: number;
+}
 
 export function Home() {
-  const [cotacoes, setCotacoes] = useState({
-    soja: 10.50,
-    trigo: 5.20,
-    milho: 3.80,
-  });
+  const [cotacoes, setCotacoes] = useState<Cotacoes | null>(null);
   const [dolar, setDolar] = useState()
-  const [error, setError] = useState(null);
-  const [climaAtual, setClimaAtual] = useState(null);
-  const [previsaoSemanal, setPrevisaoSemanal] = useState(null);
-  const [cidadePesquisada, setCidadePesquisada] = useState('Rio de Janeiro');
+  const [error, setError] = useState('');
+  const [climaAtual, setClimaAtual] = useState<ClimaAtual | null>(null);
+  const [previsaoSemanal, setPrevisaoSemanal] = useState<PrevisaoSemanal[] | null>(null);
+  const [cidadePesquisada, setCidadePesquisada] = useState('Ivaiporã');
 
-  const apiKey = 'ab6a220cac87466da0a141821240904'; // Substitua 'SUA_CHAVE_DE_API' pela sua chave de API do WeatherAPI
+  const apiKey = 'ab6a220cac87466da0a141821240904';
+  const apiKeyAlphaVantage = 'PX2CX8TCUX7SJHGO';
 
 
   useEffect(() => {
@@ -67,27 +87,47 @@ export function Home() {
         const response = await fetch(`http://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${cidadePesquisada}&days=7`);
         const data = await response.json();
         setPrevisaoSemanal(data.forecast.forecastday);
-        data.forecast.forecastday.forEach(dia => {
-          console.log("Condição do clima para", dia.date, ":", dia.day.condition.text);
-        });
       } catch (err) {
         setError('Erro ao obter a previsão semanal.');
       }
     };
+    async function fetchCotacoesGranos() {
+      const symbols = ['SOYB', 'WHEAT', 'CORN']; // Símbolos para Soja, Trigo e Milho
+
+      try {
+        const response = await fetch(`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbols}&apikey=${apiKeyAlphaVantage}`)
+        const data = await response.json();
+        console.log('graos', data)
+
+        // const results = await Promise.all(promises);
+        // const cotacoes = results.reduce((acc, result, index) => {
+        //   const symbol = symbols[index];
+        //   const price = result['Global Quote'] ? result['Global Quote']['05. price'] : 'N/A';
+        //   acc[symbol.toLowerCase()] = parseFloat(price);
+        //   return acc;
+        // }, {});
+
+        setCotacoes(cotacoes);
+      } catch (err) {
+        console.log(err);
+        setError('Erro ao obter cotações dos grãos.');
+      }
+    }
 
     fetchCotacoesDolar();
     fetchClimaAtual();
     fetchPrevisaoSemanal()
     getUserLocation();
+    fetchCotacoesGranos()
   }, []);
 
   if (error) {
     return <div className="container mx-auto mt-10 text-red-500">{error}</div>;
   }
-  const conditionTranslations = (condition) => {
+  const conditionTranslations = (condition: string) => {
     const translations = {
       'Sunny': 'Ensolarado',
-      'Partly cloudy': 'Parcialmente nublado',
+      'Partly Cloudy ': 'Parcialmente nublado',
       'Mostly cloudy': 'Muito nublado',
       'Cloudy': 'Nublado',
       'Overcast': 'Céu cerrado',
@@ -108,44 +148,45 @@ export function Home() {
       'Broken clouds': 'Nuvens quebradas',
       'Fog': 'Névoa',
     };
+    //@ts-ignore
     return translations[condition] || condition;
   };
-  const getIconByCondition = (condition, className, size) => {
+  const getIconByCondition = (condition: string, className: string) => {
     // Mapeamento detalhado entre condições de clima e ícones
     const conditionIcons = {
-      'Sunny': <img src="/img/sol.svg" size={size} />,
-      'Partly cloudy': <img src="/img/parcialmente-nublado.svg" size={size} />,
-      'Mostly cloudy': <img src="/img/nublado.svg" size={size} />,
-      'Cloudy': <img src="/img/nublado.svg" size={size} />,
-      'Overcast': <img src="/img/nublado.svg" size={size} />,
-      'Light rain': <img src="/img/chuva.svg" size={size} />,
-      'Rain': <img src="/img/chuva.svg" size={size} />,
-      'Heavy rain': <img src="/img/chuva.svg" size={size} />,
-      'Snow': <img src="/img/granizo.svg" size={size} />,
-      'Sleet': <img src="/img/granizo.svg" size={size} />,
-      'Light snow': <img src="/img/granizo.svg" size={size} />,
-      'Heavy snow': <img src="/img/granizo.svg" size={size} />,
-      'Thunderstorm': <img src="/img/trovoada.svg" size={size} />,
-      'Light thunderstorm': <img src="/img/trovoada.svg" size={size} />,
-      'Heavy thunderstorm': <img src="/img/trovoada.svg" size={size} />,
-      'Patchy rain nearby': <img src="/img/chuva.svg" size={size} />,
-      'Moderate rain': <img src="/img/chuva.svg" size={size} />,
-      'Clear': <img src="/img/sol.svg" size={size} />,
-      'Scattered clouds': <img src="/img/parcialmente-nublado.svg" size={size} />,
-      'Broken clouds': <img src="/img/parcialmente-nublado.svg" size={size} />,
-      'Fog': <img src="/img/granizo.svg" size={size} />,
+      'Sunny': <img src="/img/sol.svg" className={className} />,
+      'Partly Cloudy ': <img src="/img/parcialmente-nublado.svg" className={className} />,
+      'Mostly cloudy': <img src="/img/nublado.svg" className={className} />,
+      'Cloudy': <img src="/img/nublado.svg" className={className} />,
+      'Overcast': <img src="/img/nublado.svg" className={className} />,
+      'Light rain': <img src="/img/chuva.svg" className={className} />,
+      'Rain': <img src="/img/chuva.svg" className={className} />,
+      'Heavy rain': <img src="/img/chuva.svg" className={className} />,
+      'Snow': <img src="/img/granizo.svg" className={className} />,
+      'Sleet': <img src="/img/granizo.svg" className={className} />,
+      'Light snow': <img src="/img/granizo.svg" className={className} />,
+      'Heavy snow': <img src="/img/granizo.svg" className={className} />,
+      'Thunderstorm': <img src="/img/trovoada.svg" className={className} />,
+      'Light thunderstorm': <img src="/img/trovoada.svg" className={className} />,
+      'Heavy thunderstorm': <img src="/img/trovoada.svg" className={className} />,
+      'Patchy rain nearby': <img src="/img/chuva.svg" className={className} />,
+      'Moderate rain': <img src="/img/chuva.svg" className={className} />,
+      'Clear': <img src="/img/sol.svg" className={className} />,
+      'Scattered clouds': <img src="/img/parcialmente-nublado.svg" className={className} />,
+      'Broken clouds': <img src="/img/parcialmente-nublado.svg" className={className} />,
+      'Fog': <img src="/img/granizo.svg" className={className} />,
       // Adicione mais condições conforme necessário
     };
 
-    // Retorna o ícone correspondente à condição ou um ícone padrão se a condição não estiver mapeada
-    return conditionIcons[condition] || <WiCloudy className={className} size={size} />;
+    //@ts-ignore
+    return conditionIcons[condition] || <img src="/img/parcialmente-nublado.svg" className={className} />;
   };
   const formatCurrentDate = () => {
     const currentDate = new Date();
     // Formata a data atual para incluir a quebra de linha entre o dia da semana e a data
     return format(currentDate, 'EEEE', { locale: ptBR }) + '<br />' + format(currentDate, 'dd \'de\' MMMM \'de\' yyyy', { locale: ptBR });
   };
-  const formatarDiaDaSemana = (dataISO) => {
+  const formatarDiaDaSemana = (dataISO: string) => {
     // Converte a string ISO para um objeto Date
     const data = new Date(dataISO);
     // Formata a data para exibir apenas o dia da semana
@@ -167,14 +208,14 @@ export function Home() {
     }
   };
 
-  const handleCidadeChange = (event) => {
+  const handleCidadeChange = (event: any) => {
     setCidadePesquisada(event.target.value);
   };
 
 
 
   return (
-    <div className='h-[89.4vh] w-full'>
+    <div className=' w-full'>
       <Header />
       <div className=' w-full grid grid-cols-2 h-full relative'>
         <div className='mt-4 p-8'>
@@ -197,7 +238,7 @@ export function Home() {
           {climaAtual && (
             <div>
               <p className='text-primary text-xl '> {conditionTranslations(climaAtual.current.condition.text)}</p>
-              <div className='flex gap-4'>{getIconByCondition(climaAtual.current.condition.text, 'text-4xl text-secondary', '300px')}
+              <div className='flex gap-4'>{getIconByCondition(climaAtual.current.condition.text, 'text-4xl text-secondary w-52')}
                 <div>
                   <h2 className='uppercase text-6xl font-bold text-primary'>{cidadePesquisada}</h2>
                   <p className='text-center text-2xl' dangerouslySetInnerHTML={{ __html: formatCurrentDate() }}></p>
@@ -217,8 +258,8 @@ export function Home() {
               {previsaoSemanal.map((dia, index) => (
                 <div key={index} className='flex flex-col items-center'>
                   <h3 className='uppercase font-bold text-primary'>{formatarDiaDaSemana(dia.date)}</h3>
-                  <div className='flex flex-col items-center border-2 p-4 border-secondary w-full rounded-xl'>
-                    {getIconByCondition(dia.day.condition.text, 'width-24 text-secondary', '50px')}
+                  <div className='flex flex-col items-center border-2 p-4 border-secondary w-full rounded-xl h-full justify-between'>
+                    {getIconByCondition(dia.day.condition.text, 'width-24 text-secondary w-24')}
                     <p className='text-center text-sm text-primary'> {conditionTranslations(dia.day.condition.text)}</p>
                     <p className='bg-secondary p-1 text-white rounded-lg'> {dia.day.maxtemp_c}°C - {dia.day.mintemp_c}°C</p>
                     <p></p>
@@ -246,7 +287,7 @@ export function Home() {
                   <h2 className="text-xl mb-2">Soja</h2>
                 </div>
                 <p className="text-xl">
-                  <span className='font-bold text-secondary'>R$</span>{(cotacoes.soja).toFixed(2)}
+                  <span className='font-bold text-secondary'>R$</span>{cotacoes.soja ? cotacoes.soja.toFixed(2) : 'Carregando...'}
                 </p>
               </div>
               <div className="p-4 rounded flex flex-col justify-center items-center z-50">
@@ -255,7 +296,7 @@ export function Home() {
                   <h2 className="text-xl mb-2">Milho</h2>
                 </div>
                 <p className="text-xl">
-                  <span className='font-bold text-secondary'>R$</span>{(cotacoes.milho).toFixed(2)}
+                  <span className='font-bold text-secondary'>R$</span>{cotacoes.milho ? cotacoes.milho.toFixed(2) : 'Carregando...'}
                 </p>
               </div>
               <div className="p-4 rounded flex flex-col justify-center items-center z-50">
@@ -264,7 +305,7 @@ export function Home() {
                   <h2 className="text-xl mb-2">Trigo</h2>
                 </div>
                 <p className="text-xl">
-                  <span className='font-bold text-secondary'>R$</span>{(cotacoes.trigo).toFixed(2)}
+                  <span className='font-bold text-secondary'>R$</span>{cotacoes.trigo ? cotacoes.trigo.toFixed(2) : 'Carregando...'}
                 </p>
               </div>
             </div>
