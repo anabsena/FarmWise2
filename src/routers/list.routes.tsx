@@ -22,5 +22,13 @@ export const routesList = createBrowserRouter([
     path: '/sign-in',
     element: <SignIn />,
   },
-  
+  {
+    path: '/home',
+    element: <Home />,
+  },
+  {
+    path: '/sugestões-plantação',
+    element: <Home />,
+  },
+
 ]);

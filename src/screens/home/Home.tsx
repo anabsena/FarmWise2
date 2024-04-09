@@ -217,11 +217,11 @@ export function Home() {
   return (
     <div className=' w-full'>
       <Header />
-      <div className=' w-full grid grid-cols-2 h-full relative'>
+      <div className=' w-full grid grid-cols-1 md:grid-cols-2 h-full relative'>
         <div className='mt-4 p-8'>
           <form onSubmit={(e) => e.preventDefault()} className='flex flex-col gap-4 w-full justify-center items-center mb-4'>
             <label htmlFor="">Digite uma cidade</label>
-            <div className='flex  gap-4  justify-center'>
+            <div className='flex flex-col sm:flex-row gap-4  justify-center'>
 
               <input
                 type="text"
@@ -238,7 +238,7 @@ export function Home() {
           {climaAtual && (
             <div>
               <p className='text-primary text-xl '> {conditionTranslations(climaAtual.current.condition.text)}</p>
-              <div className='flex gap-4'>{getIconByCondition(climaAtual.current.condition.text, 'text-4xl text-secondary w-52')}
+              <div className='flex flex-col sm:flex-row gap-4'>{getIconByCondition(climaAtual.current.condition.text, 'text-4xl text-secondary w-52')}
                 <div>
                   <h2 className='uppercase text-6xl font-bold text-primary'>{cidadePesquisada}</h2>
                   <p className='text-center text-2xl' dangerouslySetInnerHTML={{ __html: formatCurrentDate() }}></p>
@@ -254,7 +254,7 @@ export function Home() {
           </div>
 
           {previsaoSemanal && (
-            <div className='grid grid-cols-4 mt-12 gap-4'>
+            <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 mt-12 gap-4'>
               {previsaoSemanal.map((dia, index) => (
                 <div key={index} className='flex flex-col items-center'>
                   <h3 className='uppercase font-bold text-primary'>{formatarDiaDaSemana(dia.date)}</h3>
@@ -312,7 +312,7 @@ export function Home() {
           ) : (
             <p className="text-center mt-5">Carregando...</p>
           )}
-          <img src="/img/moeda.svg" className='absolute bottom-0 right-0 opacity-60 z-0' alt="" />
+          <img src="/img/moeda.svg" className='absolute bottom-0 right-0 opacity-60 z-0 hidden md:flex' alt="" />
         </div>
       </div>
     </div >
