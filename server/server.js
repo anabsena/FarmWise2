@@ -8,15 +8,7 @@ const PORT = 3001;
 app.use(cors());
 
 // Função para obter a cotação do dólar
-async function getDolarCotacao() {
-  try {
-    const response = await axios.get('https://api.bcb.gov.br/dados/serie/bcdata.sgs.10813/dados/ultimos/1?formato=json');
-    const dolarValue = response.data[0].valor;
-    return parseFloat(dolarValue);
-  } catch (error) {
-    throw new Error('Erro ao obter cotação do dólar.');
-  }
-}
+
 
 app.get('/cotacao', async (req, res) => {
   try {
@@ -30,17 +22,14 @@ app.get('/cotacao', async (req, res) => {
     const milho = milhoResponse.data.dataset.data[0][4];
     const trigo = trigoResponse.data.dataset.data[0][4];
 
-    const dolarCotacao = await getDolarCotacao();
+    
 
-    const sojaEmReais = soja * dolarCotacao;
-    const milhoEmReais = milho * dolarCotacao;
-    const trigoEmReais = trigo * dolarCotacao;
+    
 
     res.json({
-      soja: { valor: soja, valorEmReais: sojaEmReais },
-      milho: { valor: milho, valorEmReais: milhoEmReais },
-      trigo: { valor: trigo, valorEmReais: trigoEmReais },
-      dolar: dolarCotacao
+      soja: { valor: soja },
+      milho: { valor: milho},
+      trigo: { valor: trigo }
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
