@@ -37,7 +37,7 @@ export function Home() {
   const [cidadePesquisada, setCidadePesquisada] = useState('Ivaiporã');
 
   const apiKey = 'ab6a220cac87466da0a141821240904';
-  const apiKeyAlphaVantage = 'PX2CX8TCUX7SJHGO';
+  const apiKeyAlphaVantage = 'BF07LIMDCDMSOT41';
 
 
   useEffect(() => {
@@ -91,34 +91,34 @@ export function Home() {
         setError('Erro ao obter a previsão semanal.');
       }
     };
-    async function fetchCotacoesGranos() {
-      const symbols = ['SOYB', 'WHEAT', 'CORN']; // Símbolos para Soja, Trigo e Milho
+    // async function fetchCotacoesGranos() {
+    //   const symbols = ['SOYB', 'WHEAT', 'CORN']; // Símbolos para Soja, Trigo e Milho
 
-      try {
-        const response = await fetch(`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbols}&apikey=${apiKeyAlphaVantage}`)
-        const data = await response.json();
-        console.log('graos', data)
+    //   try {
+    //     const response = await fetch(`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbols}&apikey=${apiKeyAlphaVantage}`)
+    //     const data = await response.json();
+    //     console.log('graos', data)
 
-        // const results = await Promise.all(promises);
-        // const cotacoes = results.reduce((acc, result, index) => {
-        //   const symbol = symbols[index];
-        //   const price = result['Global Quote'] ? result['Global Quote']['05. price'] : 'N/A';
-        //   acc[symbol.toLowerCase()] = parseFloat(price);
-        //   return acc;
-        // }, {});
+    //     // const results = await Promise.all(promises);
+    //     // const cotacoes = results.reduce((acc, result, index) => {
+    //     //   const symbol = symbols[index];
+    //     //   const price = result['Global Quote'] ? result['Global Quote']['05. price'] : 'N/A';
+    //     //   acc[symbol.toLowerCase()] = parseFloat(price);
+    //     //   return acc;
+    //     // }, {});
 
-        setCotacoes(cotacoes);
-      } catch (err) {
-        console.log(err);
-        setError('Erro ao obter cotações dos grãos.');
-      }
-    }
+    //     setCotacoes(cotacoes);
+    //   } catch (err) {
+    //     console.log(err);
+    //     setError('Erro ao obter cotações dos grãos.');
+    //   }
+    // }
 
     fetchCotacoesDolar();
     fetchClimaAtual();
     fetchPrevisaoSemanal()
     getUserLocation();
-    fetchCotacoesGranos()
+    // fetchCotacoesGranos()
   }, []);
 
   if (error) {
@@ -212,6 +212,46 @@ export function Home() {
     setCidadePesquisada(event.target.value);
   };
 
+  const handleAtualizarCotacoesGranos = async () => {
+    const symbols = ['SOYB', 'WHEAT', 'CORN'];
+
+    try {
+      const promises = symbols.map(async (symbol) => {
+        const response = await fetch(`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=${symbol}&apikey=${apiKeyAlphaVantage}`);
+        const data = await response.json();
+
+        if (data.Information) {
+          console.error(`Resposta da API para ${symbol}:`, data);
+          throw new Error(`Dados de cotação para ${symbol} inválidos. Limite de uso gratuito atingido.`);
+        }
+
+        if (!data['Time Series (Daily)']) {
+          console.error(`Resposta da API para ${symbol}:`, data);
+          throw new Error(`Dados de cotação para ${symbol} inválidos.`);
+        }
+
+        const latestDate = Object.keys(data['Time Series (Daily)'])[0];
+        return {
+          symbol: symbol.toLowerCase(),
+          price: parseFloat(data['Time Series (Daily)'][latestDate]['4. close'])
+        };
+      });
+
+      const results = await Promise.all(promises);
+
+      const cotacoesAtualizadas = {
+        soja: results.find(item => item.symbol === 'soyb')?.price || 0,
+        milho: results.find(item => item.symbol === 'corn')?.price || 0,
+        trigo: results.find(item => item.symbol === 'wheat')?.price || 0
+      };
+
+      setCotacoes(cotacoesAtualizadas);
+    } catch (err) {
+      console.error(err);
+      setError('Erro ao atualizar cotações dos grãos. Limite de uso gratuito atingido.');
+    }
+  };
+
 
 
   return (
@@ -279,6 +319,12 @@ export function Home() {
             </p>
           </div>
           <h1 className="text-3xl mb-5">Cotações de grãos</h1>
+          <button
+            onClick={handleAtualizarCotacoesGranos}
+            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4"
+          >
+            Atualizar Cotações de Grãos
+          </button>
           {cotacoes ? (
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 ">
               <div className="p-4 rounded flex flex-col justify-center items-center z-50">
@@ -308,6 +354,7 @@ export function Home() {
                   <span className='font-bold text-secondary'>R$</span>{cotacoes.trigo ? cotacoes.trigo.toFixed(2) : 'Carregando...'}
                 </p>
               </div>
+
             </div>
           ) : (
             <p className="text-center mt-5">Carregando...</p>
