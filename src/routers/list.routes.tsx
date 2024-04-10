@@ -4,6 +4,7 @@ import { Home } from "../screens";
 import Auth from "../screens/Auth/Auth";
 import { SignUp } from "../screens/Auth/SignUp/SignUp";
 import { SignIn } from "../screens/Auth/SignIn/SignIn";
+import Plantation from "../screens/Plantation/Plantation";
 
 export const routesList = createBrowserRouter([
   {
@@ -28,7 +29,7 @@ export const routesList = createBrowserRouter([
   },
   {
     path: '/sugestões-plantação',
-    element: <Home />,
+    element: <Plantation />,
   },
 
 ]);

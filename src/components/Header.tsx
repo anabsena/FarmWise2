@@ -22,7 +22,7 @@ export const Header = (): JSX.Element => {
           </button>
           {/* Menu de navegação */}
         <Link to='/home'><img src="/img/icon-header.svg" className="absolute top-2 w-28  hidden md:flex" alt="" /></Link>
-          <div className={`${isMenuOpen ? 'flex flex-col absolute top-16 right-0 bg-secondary/90 p-4 w-full gap-4' : 'hidden'} lg:flex gap-2 items-center text-xl text-white z-50`}>
+          <div className={`${isMenuOpen ? 'flex flex-col absolute top-16 right-0 bg-secondary/90 p-4 w-full gap-4' : 'hidden'} lg:flex gap-8 items-center text-xl text-white z-50`}>
             <Link to='/home'><h1>Home</h1></Link>
             <Link to='/sugestões-plantação'><h1>Plantação</h1></Link>
           </div>

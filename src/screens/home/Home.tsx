@@ -147,6 +147,7 @@ export function Home() {
       'Scattered clouds': 'Nuvens dispersas',
       'Broken clouds': 'Nuvens quebradas',
       'Fog': 'Névoa',
+      'Mist': 'Neblina'
     };
     //@ts-ignore
     return translations[condition] || condition;
@@ -185,6 +186,7 @@ export function Home() {
     const currentDate = new Date();
     // Formata a data atual para incluir a quebra de linha entre o dia da semana e a data
     return format(currentDate, 'EEEE', { locale: ptBR }) + '<br />' + format(currentDate, 'dd \'de\' MMMM \'de\' yyyy', { locale: ptBR });
+    
   };
   const formatarDiaDaSemana = (dataISO: string) => {
     // Converte a string ISO para um objeto Date
