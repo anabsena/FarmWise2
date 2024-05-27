@@ -36,7 +36,7 @@ export function Home() {
   const [previsaoSemanal, setPrevisaoSemanal] = useState<PrevisaoSemanal[] | null>(null);
   const [cidadePesquisada, setCidadePesquisada] = useState('Ivaiporã');
 
-  const apiKey = 'ab6a220cac87466da0a141821240904';
+  const apiKey = 'c1e1305fb6714352b33232509242705';
   // const apiKeyAlphaVantage = 'BF07LIMDCDMSOT41';
 
 
@@ -155,6 +155,7 @@ export function Home() {
     return translations[condition] || condition;
   };
 
+
   // Dentro do componente Home
   const getIconByCondition = (condition: string, className: string) => {
     const conditionIcons: { [key: string]: JSX.Element } = {
@@ -190,11 +191,13 @@ export function Home() {
     return format(currentDate, 'EEEE', { locale: ptBR }) + '<br />' + format(currentDate, 'dd \'de\' MMMM \'de\' yyyy', { locale: ptBR });
   };
 
-  const formatarDiaDaSemana = (dataISO: string) => {
-    const data = new Date(dataISO);
-    return format(data, 'EEEE', { locale: ptBR });
-  };
+  const formatarDiaDaSemana = (dataISO: string, index: number) => {
+    const hoje = new Date();
+    const dia = new Date(dataISO);
+    dia.setDate(hoje.getDate() + index+1); // Ajusta para o dia correto da semana
 
+    return format(dia, 'EEEE', { locale: ptBR });
+  };
   const handleBuscarClima = async () => {
     if (!cidadePesquisada) return;
     try {
@@ -259,8 +262,8 @@ export function Home() {
   return (
     <div className=' w-full'>
       <Header />
-      <div className=' w-full grid grid-cols-1 md:grid-cols-2 h-full relative'>
-        <div className='mt-4 p-8'>
+      <div className=' w-full grid grid-cols-1 md:grid-cols-3 h-full relative'>
+        <div className='mt-4 p-8 col-span-2'>
           <form onSubmit={(e) => e.preventDefault()} className='flex flex-col gap-4 w-full justify-center items-center mb-4'>
             <label htmlFor="">Digite uma cidade</label>
             <div className='flex flex-col sm:flex-row gap-4  justify-center'>
@@ -296,9 +299,9 @@ export function Home() {
           </div>
           {previsaoSemanal && (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-12">
-              {previsaoSemanal.slice(0, 7).map((dia, index) => (
+              {previsaoSemanal.map((dia, index) => (
                 <div key={index} className="flex flex-col items-center">
-                  <h3 className="uppercase font-bold text-primary">{formatarDiaDaSemana(dia.date)}</h3>
+                  <h3 className="uppercase font-bold text-primary">{formatarDiaDaSemana(dia.date, index)}</h3>
                   <div className="flex flex-col items-center border-2 border-secondary p-4 rounded-xl w-full h-full justify-between">
                     {getIconByCondition(dia.day.condition.text, 'w-24')}
                     <p className="text-center text-sm text-primary">{conditionTranslations(dia.day.condition.text)}</p>
