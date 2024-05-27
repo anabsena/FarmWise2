@@ -22,14 +22,14 @@ interface PrevisaoSemanal {
     mintemp_c: number;
   };
 }
-interface Cotacoes {
-  soja: number;
-  milho: number;
-  trigo: number;
-}
+// interface Cotacoes {
+//   soja: number;
+//   milho: number;
+//   trigo: number;
+// }
 
 export function Home() {
-  const [cotacoes, setCotacoes] = useState<Cotacoes | null>(null);
+  // const [cotacoes, setCotacoes] = useState<Cotacoes | null>(null);
   const [dolar, setDolar] = useState()
   const [error, setError] = useState('');
   const [climaAtual, setClimaAtual] = useState<ClimaAtual | null>(null);
@@ -37,7 +37,7 @@ export function Home() {
   const [cidadePesquisada, setCidadePesquisada] = useState('Ivaiporã');
 
   const apiKey = 'ab6a220cac87466da0a141821240904';
-  const apiKeyAlphaVantage = 'BF07LIMDCDMSOT41';
+  // const apiKeyAlphaVantage = 'BF07LIMDCDMSOT41';
 
 
   useEffect(() => {
@@ -86,6 +86,7 @@ export function Home() {
       try {
         const response = await fetch(`http://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${cidadePesquisada}&days=7`);
         const data = await response.json();
+        console.log(data)
         setPrevisaoSemanal(data.forecast.forecastday);
       } catch (err) {
         setError('Erro ao obter a previsão semanal.');
@@ -124,6 +125,7 @@ export function Home() {
   if (error) {
     return <div className="container mx-auto mt-10 text-red-500">{error}</div>;
   }
+  // Fora do componente Home (ou em uma função utilitária)
   const conditionTranslations = (condition: string) => {
     const translations = {
       'Sunny': 'Ensolarado',
@@ -147,56 +149,54 @@ export function Home() {
       'Scattered clouds': 'Nuvens dispersas',
       'Broken clouds': 'Nuvens quebradas',
       'Fog': 'Névoa',
-      'Mist': 'Neblina'
+      'Mist': 'Neblina',
+      'Light drizzle': 'Chuvisco leve',
     };
-    //@ts-ignore
     return translations[condition] || condition;
   };
-  const getIconByCondition = (condition: string, className: string) => {
-    // Mapeamento detalhado entre condições de clima e ícones
-    const conditionIcons = {
-      'Sunny': <img src="/img/sol.svg" className={className} />,
-      'Partly Cloudy ': <img src="/img/parcialmente-nublado.svg" className={className} />,
-      'Mostly cloudy': <img src="/img/nublado.svg" className={className} />,
-      'Cloudy': <img src="/img/nublado.svg" className={className} />,
-      'Overcast': <img src="/img/nublado.svg" className={className} />,
-      'Light rain': <img src="/img/chuva.svg" className={className} />,
-      'Rain': <img src="/img/chuva.svg" className={className} />,
-      'Heavy rain': <img src="/img/chuva.svg" className={className} />,
-      'Snow': <img src="/img/granizo.svg" className={className} />,
-      'Sleet': <img src="/img/granizo.svg" className={className} />,
-      'Light snow': <img src="/img/granizo.svg" className={className} />,
-      'Heavy snow': <img src="/img/granizo.svg" className={className} />,
-      'Thunderstorm': <img src="/img/trovoada.svg" className={className} />,
-      'Light thunderstorm': <img src="/img/trovoada.svg" className={className} />,
-      'Heavy thunderstorm': <img src="/img/trovoada.svg" className={className} />,
-      'Patchy rain nearby': <img src="/img/chuva.svg" className={className} />,
-      'Moderate rain': <img src="/img/chuva.svg" className={className} />,
-      'Clear': <img src="/img/sol.svg" className={className} />,
-      'Scattered clouds': <img src="/img/parcialmente-nublado.svg" className={className} />,
-      'Broken clouds': <img src="/img/parcialmente-nublado.svg" className={className} />,
-      'Fog': <img src="/img/granizo.svg" className={className} />,
-      // Adicione mais condições conforme necessário
-    };
 
-    //@ts-ignore
-    return conditionIcons[condition] || <img src="/img/parcialmente-nublado.svg" className={className} />;
+  // Dentro do componente Home
+  const getIconByCondition = (condition: string, className: string) => {
+    const conditionIcons: { [key: string]: JSX.Element } = {
+      'Sunny': <img src="/img/sol.svg" className={className} alt="Ensolarado" />,
+      'Partly Cloudy ': <img src="/img/parcialmente-nublado.svg" className={className} alt="Parcialmente nublado" />,
+      'Mostly cloudy': <img src="/img/nublado.svg" className={className} alt="Muito nublado" />,
+      'Cloudy': <img src="/img/nublado.svg" className={className} alt="Nublado" />,
+      'Overcast': <img src="/img/nublado.svg" className={className} alt="Céu cerrado" />,
+      'Light rain': <img src="/img/chuva.svg" className={className} alt="Chuva leve" />,
+      'Rain': <img src="/img/chuva.svg" className={className} alt="Chuva" />,
+      'Heavy rain': <img src="/img/chuva.svg" className={className} alt="Chuva forte" />,
+      'Snow': <img src="/img/granizo.svg" className={className} alt="Neve" />,
+      'Sleet': <img src="/img/granizo.svg" className={className} alt="Granizo" />,
+      'Light snow': <img src="/img/granizo.svg" className={className} alt="Neve leve" />,
+      'Heavy snow': <img src="/img/granizo.svg" className={className} alt="Neve forte" />,
+      'Thunderstorm': <img src="/img/trovoada.svg" className={className} alt="Tempestade" />,
+      'Light thunderstorm': <img src="/img/trovoada.svg" className={className} alt="Tempestade leve" />,
+      'Heavy thunderstorm': <img src="/img/trovoada.svg" className={className} alt="Tempestade forte" />,
+      'Patchy rain nearby': <img src="/img/chuva.svg" className={className} alt="Possibilidade de chuva" />,
+      'Moderate rain': <img src="/img/chuva.svg" className={className} alt="Chuva moderada" />,
+      'Clear': <img src="/img/sol.svg" className={className} alt="Limpo" />,
+      'Scattered clouds': <img src="/img/parcialmente-nublado.svg" className={className} alt="Nuvens dispersas" />,
+      'Broken clouds': <img src="/img/parcialmente-nublado.svg" className={className} alt="Nuvens quebradas" />,
+      'Fog': <img src="/img/granizo.svg" className={className} alt="Névoa" />,
+      'Light drizzle': <img src="/img/chuva.svg" className={className} alt="Chuvisco leve" />,
+    };
+    return conditionIcons[condition] || <img src="/img/parcialmente-nublado.svg" className={className} alt="Condição desconhecida" />;
   };
+
+
   const formatCurrentDate = () => {
     const currentDate = new Date();
-    // Formata a data atual para incluir a quebra de linha entre o dia da semana e a data
     return format(currentDate, 'EEEE', { locale: ptBR }) + '<br />' + format(currentDate, 'dd \'de\' MMMM \'de\' yyyy', { locale: ptBR });
-    
   };
+
   const formatarDiaDaSemana = (dataISO: string) => {
-    // Converte a string ISO para um objeto Date
     const data = new Date(dataISO);
-    // Formata a data para exibir apenas o dia da semana
     return format(data, 'EEEE', { locale: ptBR });
   };
+
   const handleBuscarClima = async () => {
     if (!cidadePesquisada) return;
-
     try {
       const responseClima = await fetch(`http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${cidadePesquisada}`);
       const dataClima = await responseClima.json();
@@ -206,7 +206,7 @@ export function Home() {
       const dataPrevisao = await responsePrevisao.json();
       setPrevisaoSemanal(dataPrevisao.forecast.forecastday);
     } catch (err) {
-      setError('Erro ao buscar o clima e previsão semanal.');
+      setError('Erro ao buscar dados meteorológicos.');
     }
   };
 
@@ -214,45 +214,45 @@ export function Home() {
     setCidadePesquisada(event.target.value);
   };
 
-  const handleAtualizarCotacoesGranos = async () => {
-    const symbols = ['SOYB', 'WHEAT', 'CORN'];
+  // const handleAtualizarCotacoesGranos = async () => {
+  //   const symbols = ['SOYB', 'WHEAT', 'CORN'];
 
-    try {
-      const promises = symbols.map(async (symbol) => {
-        const response = await fetch(`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=${symbol}&apikey=${apiKeyAlphaVantage}`);
-        const data = await response.json();
+  //   try {
+  //     const promises = symbols.map(async (symbol) => {
+  //       const response = await fetch(`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=${symbol}&apikey=${apiKeyAlphaVantage}`);
+  //       const data = await response.json();
 
-        if (data.Information) {
-          console.error(`Resposta da API para ${symbol}:`, data);
-          throw new Error(`Dados de cotação para ${symbol} inválidos. Limite de uso gratuito atingido.`);
-        }
+  //       if (data.Information) {
+  //         console.error(`Resposta da API para ${symbol}:`, data);
+  //         throw new Error(`Dados de cotação para ${symbol} inválidos. Limite de uso gratuito atingido.`);
+  //       }
 
-        if (!data['Time Series (Daily)']) {
-          console.error(`Resposta da API para ${symbol}:`, data);
-          throw new Error(`Dados de cotação para ${symbol} inválidos.`);
-        }
+  //       if (!data['Time Series (Daily)']) {
+  //         console.error(`Resposta da API para ${symbol}:`, data);
+  //         throw new Error(`Dados de cotação para ${symbol} inválidos.`);
+  //       }
 
-        const latestDate = Object.keys(data['Time Series (Daily)'])[0];
-        return {
-          symbol: symbol.toLowerCase(),
-          price: parseFloat(data['Time Series (Daily)'][latestDate]['4. close'])
-        };
-      });
+  //       const latestDate = Object.keys(data['Time Series (Daily)'])[0];
+  //       return {
+  //         symbol: symbol.toLowerCase(),
+  //         price: parseFloat(data['Time Series (Daily)'][latestDate]['4. close'])
+  //       };
+  //     });
 
-      const results = await Promise.all(promises);
+  //     const results = await Promise.all(promises);
 
-      const cotacoesAtualizadas = {
-        soja: results.find(item => item.symbol === 'soyb')?.price || 0,
-        milho: results.find(item => item.symbol === 'corn')?.price || 0,
-        trigo: results.find(item => item.symbol === 'wheat')?.price || 0
-      };
+  //     const cotacoesAtualizadas = {
+  //       soja: results.find(item => item.symbol === 'soyb')?.price || 0,
+  //       milho: results.find(item => item.symbol === 'corn')?.price || 0,
+  //       trigo: results.find(item => item.symbol === 'wheat')?.price || 0
+  //     };
 
-      setCotacoes(cotacoesAtualizadas);
-    } catch (err) {
-      console.error(err);
-      setError('Erro ao atualizar cotações dos grãos. Limite de uso gratuito atingido.');
-    }
-  };
+  //     setCotacoes(cotacoesAtualizadas);
+  //   } catch (err) {
+  //     console.error(err);
+  //     setError('Erro ao atualizar cotações dos grãos. Limite de uso gratuito atingido.');
+  //   }
+  // };
 
 
 
@@ -294,17 +294,15 @@ export function Home() {
           <div className='w-full flex justify-center'>
             <hr className='h-0.5 rounded-full w-[90%] border-none bg-primary' />
           </div>
-
           {previsaoSemanal && (
-            <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 mt-12 gap-4'>
-              {previsaoSemanal.map((dia, index) => (
-                <div key={index} className='flex flex-col items-center'>
-                  <h3 className='uppercase font-bold text-primary'>{formatarDiaDaSemana(dia.date)}</h3>
-                  <div className='flex flex-col items-center border-2 p-4 border-secondary w-full rounded-xl h-full justify-between'>
-                    {getIconByCondition(dia.day.condition.text, 'width-24 text-secondary w-24')}
-                    <p className='text-center text-sm text-primary'> {conditionTranslations(dia.day.condition.text)}</p>
-                    <p className='bg-secondary p-1 text-white rounded-lg'> {dia.day.maxtemp_c}°C - {dia.day.mintemp_c}°C</p>
-                    <p></p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-12">
+              {previsaoSemanal.slice(0, 7).map((dia, index) => (
+                <div key={index} className="flex flex-col items-center">
+                  <h3 className="uppercase font-bold text-primary">{formatarDiaDaSemana(dia.date)}</h3>
+                  <div className="flex flex-col items-center border-2 border-secondary p-4 rounded-xl w-full h-full justify-between">
+                    {getIconByCondition(dia.day.condition.text, 'w-24')}
+                    <p className="text-center text-sm text-primary">{conditionTranslations(dia.day.condition.text)}</p>
+                    <p className="bg-secondary p-1 text-white rounded-lg">{`${dia.day.maxtemp_c.toFixed(1)}°C - ${dia.day.mintemp_c.toFixed(1)}°C`}</p>
                   </div>
                 </div>
               ))}
@@ -320,7 +318,7 @@ export function Home() {
               <span className=' text-secondary font-bold'>R$</span>{dolar}
             </p>
           </div>
-          <h1 className="text-3xl mb-5">Cotações de grãos</h1>
+          {/* <h1 className="text-3xl mb-5">Cotações de grãos</h1>
           <button
             onClick={handleAtualizarCotacoesGranos}
             className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4"
@@ -360,7 +358,7 @@ export function Home() {
             </div>
           ) : (
             <p className="text-center mt-5">Carregando...</p>
-          )}
+          )} */}
           <img src="/img/moeda.svg" className='absolute bottom-0 right-0 opacity-60 z-0 hidden md:flex' alt="" />
         </div>
       </div>
