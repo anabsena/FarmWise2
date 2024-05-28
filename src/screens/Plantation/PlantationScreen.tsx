@@ -16,7 +16,7 @@ const PlantationScreen = () => {
   const [cultivar, setCultivar] = useState([]);
   const [produtividadeData, setProdutividadeData] = useState({});
 
-  const AGROAPI_TOKEN = '2ba496a3-9b14-3d22-bf63-93cad1fc37ae'; // Substitua pela sua chave API
+  const AGROAPI_TOKEN = '3685744e-f145-3f69-8cec-2f735041a2ec'; // Substitua pela sua chave API
 
   useEffect(() => {
     const fetchCulturas = async () => {
