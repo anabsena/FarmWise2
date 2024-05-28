@@ -8,7 +8,7 @@ const PlantationScreen = () => {
   const [risco, setRisco] = useState('20');  // Risco padrão de 20%
   const [culturas, setCulturas] = useState([]);
   const [municipios, setMunicipios] = useState([]);
-  const [zoneamento, setZoneamento] = useState([]);
+  const [zoneamento, setZoneamento] = useState({});
   const [cad, setCAD] = useState('');
   const [expectativaProdutividade, setExpectativaProdutividade] = useState('');
   const [cultivar, setCultivar] = useState([]);
@@ -66,50 +66,42 @@ const PlantationScreen = () => {
         }
       });
       const data = await response.json();
-      const groupedZoneamento = {};
-      data.data.forEach(item => {
-        const key = `${item.cultura}_${item.municipio}_${item.solo}`;
-        if (!groupedZoneamento[key]) {
-          groupedZoneamento[key] = {
+      console.log(data)
+
+      const aggregatedData = data.data.reduce((acc, item) => {
+        const key = `${item.cultura}_${item.municipio}`;
+        if (!acc[key]) {
+          acc[key] = {
             cultura: item.cultura,
             municipio: item.municipio,
-            solo: item.solo,
-            periodos: []
+            diaIni: 0,
+            mesIni: 0,
+            diaFim: 0,
+            mesFim: 0,
+            risco: 0,
+            count: 0
           };
         }
-        groupedZoneamento[key].periodos.push({
-          diaIni: item.diaIni,
-          mesIni: item.mesIni,
-          diaFim: item.diaFim,
-          mesFim: item.mesFim,
-          risco: item.risco
-        });
-      });
+        acc[key].diaIni += item.diaIni;
+        acc[key].mesIni += item.mesIni;
+        acc[key].diaFim += item.diaFim;
+        acc[key].mesFim += item.mesFim;
+        acc[key].risco += item.risco;
+        acc[key].count += 1;
+        return acc;
+      }, {});
 
-      const averagedZoneamento = Object.values(groupedZoneamento).map(item => {
-        let bestPeriod = null;
-        let bestPeriodLength = 0;
-        item.periodos.forEach(periodo => {
-          const length = (periodo.mesFim - periodo.mesIni) * 30 + (periodo.diaFim - periodo.diaIni);
-          if (length > bestPeriodLength) {
-            bestPeriodLength = length;
-            bestPeriod = periodo;
-          }
-        });
+      const averagedZoneamento = Object.values(aggregatedData).map(item => ({
+        cultura: item.cultura,
+        municipio: item.municipio,
+        diaIni: Math.round(item.diaIni / item.count),
+        mesIni: Math.round(item.mesIni / item.count),
+        diaFim: Math.round(item.diaFim / item.count),
+        mesFim: Math.round(item.mesFim / item.count),
+        risco: (item.risco / item.count).toFixed(2)
+      }));
 
-        return {
-          cultura: item.cultura,
-          municipio: item.municipio,
-          solo: item.solo,
-          diaIni: bestPeriod.diaIni,
-          mesIni: bestPeriod.mesIni,
-          diaFim: bestPeriod.diaFim,
-          mesFim: bestPeriod.mesFim,
-          risco: bestPeriod.risco
-        };
-      });
-
-      setZoneamento(averagedZoneamento);
+      setZoneamento(averagedZoneamento[0]);  // Aqui selecionamos a primeira opção média calculada
 
       const responseCultivar = await fetch(`https://api.cnptia.embrapa.br/agritec/v1/cultivares?safra=2021-2022&idCultura=${cultura}&uf=PR`, {
         headers: {
@@ -220,17 +212,14 @@ const PlantationScreen = () => {
       </div>
       <div className="border rounded-xl p-4 flex flex-col items-start gap-4">
         <h1 className="text-4xl uppercase font-bold text-primary">Zoneamento</h1>
-        {zoneamento.length > 0 ? (
+        {zoneamento && Object.keys(zoneamento).length > 0 ? (
           <ul className="text-xl text-primary mt-4">
-            {zoneamento.map((z, index) => (
-              <li key={index}>
-                <strong>Cultura:</strong> {z.cultura},
-                <strong> Município:</strong> {z.municipio},
-                <strong> Solo:</strong> {z.solo},
-                <strong> Período:</strong> {z.diaIni}/{z.mesIni} até {z.diaFim}/{z.mesFim},
-                <strong> Risco:</strong> {z.risco}%
-              </li>
-            ))}
+            <li>
+              <strong>Cultura:</strong> {zoneamento.cultura},
+              <strong> Município:</strong> {zoneamento.municipio},
+              <strong> Período:</strong> {zoneamento.diaIni}/{zoneamento.mesIni} até {zoneamento.diaFim}/{zoneamento.mesFim},
+              <strong> Risco:</strong> {zoneamento.risco}%
+            </li>
           </ul>
         ) : (
           <p>Nenhuma informação de zoneamento disponível para a seleção atual.</p>
@@ -261,4 +250,3 @@ const PlantationScreen = () => {
 }
 
 export default PlantationScreen;
-
