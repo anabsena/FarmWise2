@@ -5,6 +5,7 @@ import Auth from "../screens/Auth/Auth";
 import { SignUp } from "../screens/Auth/SignUp/SignUp";
 import { SignIn } from "../screens/Auth/SignIn/SignIn";
 import Plantation from "../screens/Plantation/Plantation";
+import Landing from "../screens/Landing/Landing";
 
 export const routesList = createBrowserRouter([
   {
@@ -30,6 +31,10 @@ export const routesList = createBrowserRouter([
   {
     path: '/sugestões-plantação',
     element: <Plantation />,
+  },
+  {
+    path: '/landing',
+    element: <Landing />,
   },
 
 ]);
