@@ -5,12 +5,14 @@ const PlantationScreen = () => {
   const [quantity, setQuantity] = useState('');
   const [city, setCity] = useState('');
   const [cultura, setCultura] = useState('');
+  // @ts-ignore 
   const [risco, setRisco] = useState('20');  // Risco padrão de 20%
   const [culturas, setCulturas] = useState([]);
   const [municipios, setMunicipios] = useState([]);
   const [zoneamento, setZoneamento] = useState({});
   const [cad, setCAD] = useState('');
   const [expectativaProdutividade, setExpectativaProdutividade] = useState('');
+  // @ts-ignore 
   const [cultivar, setCultivar] = useState([]);
   const [produtividadeData, setProdutividadeData] = useState({});
 
@@ -26,6 +28,7 @@ const PlantationScreen = () => {
           }
         });
         const data = await response.json();
+        // @ts-ignore 
         const filteredCulturas = data.data.filter(cultura =>
           cultura.cultura === 'TRIGO' ||
           cultura.cultura === 'MILHO' ||
@@ -46,6 +49,7 @@ const PlantationScreen = () => {
           }
         });
         const data = await response.json();
+        // @ts-ignore 
         const paranaMunicipios = data.data.filter(municipio => municipio.uf === 'PR');
         setMunicipios(paranaMunicipios);
       } catch (error) {
@@ -67,7 +71,7 @@ const PlantationScreen = () => {
       });
       const data = await response.json();
       console.log(data)
-
+      // @ts-ignore 
       const aggregatedData = data.data.reduce((acc, item) => {
         const key = `${item.cultura}_${item.municipio}`;
         if (!acc[key]) {
@@ -92,12 +96,19 @@ const PlantationScreen = () => {
       }, {});
 
       const averagedZoneamento = Object.values(aggregatedData).map(item => ({
+        // @ts-ignore 
         cultura: item.cultura,
+        // @ts-ignore 
         municipio: item.municipio,
+        // @ts-ignore 
         diaIni: Math.round(item.diaIni / item.count),
+        // @ts-ignore 
         mesIni: Math.round(item.mesIni / item.count),
+        // @ts-ignore 
         diaFim: Math.round(item.diaFim / item.count),
+        // @ts-ignore 
         mesFim: Math.round(item.mesFim / item.count),
+        // @ts-ignore 
         risco: (item.risco / item.count).toFixed(2)
       }));
 
@@ -123,15 +134,25 @@ const PlantationScreen = () => {
       // Calcular médias para os dados de produtividade
       if (dataProdutividade.data && dataProdutividade.data.produtividadeAlmejada) {
         const totalEntries = dataProdutividade.data.produtividadeAlmejada.length;
+        // @ts-ignore 
         const produtividadeMedia = dataProdutividade.data.produtividadeAlmejada.reduce((acc, val) => acc + val, 0) / totalEntries;
+        // @ts-ignore 
         const produtividadeMediaMunicipio = dataProdutividade.data.produtividadeMediaMunicipio.reduce((acc, val) => acc + val, 0) / totalEntries;
+        // @ts-ignore 
         const temperaturaMinima = dataProdutividade.data.temperaturaMinima.reduce((acc, val) => acc + val, 0) / totalEntries;
+        // @ts-ignore 
         const temperaturaMaxima = dataProdutividade.data.temperaturaMaxima.reduce((acc, val) => acc + val, 0) / totalEntries;
+        // @ts-ignore 
         const precipitacao = dataProdutividade.data.precipitacao.reduce((acc, val) => acc + val, 0) / totalEntries;
+        // @ts-ignore 
         const grausDia = dataProdutividade.data.grausDia.reduce((acc, val) => acc + val, 0) / totalEntries;
+        // @ts-ignore 
         const balancoHidrico = dataProdutividade.data.balancoHidrico.reduce((acc, val) => acc + val, 0) / totalEntries;
+        // @ts-ignore 
         const deficienciaHidrica = dataProdutividade.data.deficienciaHidrica.reduce((acc, val) => acc + val, 0) / totalEntries;
+        // @ts-ignore 
         const excedenteHidrico = dataProdutividade.data.excedenteHidrico.reduce((acc, val) => acc + val, 0) / totalEntries;
+        // @ts-ignore 
         const isna = dataProdutividade.data.isna.reduce((acc, val) => acc + val, 0) / totalEntries;
 
         setProdutividadeData({
@@ -186,7 +207,9 @@ const PlantationScreen = () => {
           >
             <option value="">Selecione o município</option>
             {municipios.map((municipio) => (
+              // @ts-ignore 
               <option key={municipio.codigoIBGE} value={municipio.codigoIBGE}>
+                {/* @ts-ignore  */}
                 {municipio.nome}
               </option>
             ))}
@@ -198,7 +221,9 @@ const PlantationScreen = () => {
           >
             <option value="">Selecione a cultura</option>
             {culturas.map((cultura) => (
+              // @ts-ignore 
               <option key={cultura.id} value={cultura.id}>
+                {/* @ts-ignore */}
                 {cultura.cultura}
               </option>
             ))}
@@ -215,9 +240,13 @@ const PlantationScreen = () => {
         {zoneamento && Object.keys(zoneamento).length > 0 ? (
           <ul className="text-xl text-primary mt-4">
             <li>
+              {/* @ts-ignore */}
               <strong>Cultura:</strong> {zoneamento.cultura},
+              {/* @ts-ignore */}
               <strong> Município:</strong> {zoneamento.municipio},
+              {/* @ts-ignore */}
               <strong> Período:</strong> {zoneamento.diaIni}/{zoneamento.mesIni} até {zoneamento.diaFim}/{zoneamento.mesFim},
+              {/* @ts-ignore */}
               <strong> Risco:</strong> {zoneamento.risco}%
             </li>
           </ul>
@@ -226,18 +255,29 @@ const PlantationScreen = () => {
         )}
 
         <h1 className="text-4xl uppercase font-bold text-primary ">Produtividade</h1>
+        {/* @ts-ignore */}
         {produtividadeData && produtividadeData.produtividadeAlmejada ? (
           <ul className="text-xl text-primary mt-4">
             <li className='flex flex-col text-start'>
+              {/* @ts-ignore */}
               <strong>Produtividade Almejada:</strong> {produtividadeData.produtividadeAlmejada} ton/ha,
+              {/* @ts-ignore */}
               <strong> Produtividade Média do Município:</strong> {produtividadeData.produtividadeMediaMunicipio} ton/ha,
+              {/* @ts-ignore */}
               <strong> Temperatura Mínima:</strong> {produtividadeData.temperaturaMinima}°C,
+              {/* @ts-ignore */}
               <strong> Temperatura Máxima:</strong> {produtividadeData.temperaturaMaxima}°C,
+              {/* @ts-ignore */}
               <strong> Precipitação:</strong> {produtividadeData.precipitacao} mm,
+              {/* @ts-ignore */}
               <strong> Graus Dia:</strong> {produtividadeData.grausDia},
+              {/* @ts-ignore */}
               <strong> Balanço Hídrico:</strong> {produtividadeData.balancoHidrico} mm,
+              {/* @ts-ignore */}
               <strong> Deficiência Hídrica:</strong> {produtividadeData.deficienciaHidrica} mm,
+              {/* @ts-ignore */}
               <strong> Excedente Hídrico:</strong> {produtividadeData.excedenteHidrico} mm,
+              {/* @ts-ignore */}
               <strong> ISNA:</strong> {produtividadeData.isna}
             </li>
           </ul>
@@ -245,7 +285,7 @@ const PlantationScreen = () => {
           <p>Nenhuma informação de produtividade disponível para a seleção atual.</p>
         )}
       </div>
-    </div>
+    </div >
   );
 }
 

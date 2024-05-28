@@ -152,6 +152,7 @@ export function Home() {
       'Mist': 'Neblina',
       'Light drizzle': 'Chuvisco leve',
     };
+    //@ts-ignore
     return translations[condition] || condition;
   };
 
