@@ -10,7 +10,7 @@ export const HeaderLand = (): JSX.Element => {
 
     return (
         <header className="bg-secondary shadow-md">
-            <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div className="container mx-auto p-2  flex justify-between items-center">
                 <div>
 
                     <img src="/img/icon-header.svg" className="w-20" alt="Logo" />
